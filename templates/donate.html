@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Донат</h1>
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.user_name.label }}<br>
+        {{ form.user_name(class="form-control") }}<br>
+        {% for error in form.user_name.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endfor %}
+    </p>
+    <p>
+        {{ form.donate.label }}<br>
+        {{ form.donate(class="form-control") }}<br>
+        {% for error in form.donate.errors %}
+    <div class="alert alert-danger" role="alert">2
+        {{ error }}
+    </div>
+    {% endfor %}
+    </p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{ message }}
+</form>
+{% endblock %}
+</body>
+</html>

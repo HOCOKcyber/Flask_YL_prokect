@@ -1,4 +1,3 @@
-import datetime
 import sqlalchemy
 from .db_session import SqlAlchemyBase
 
@@ -10,3 +9,4 @@ class User(SqlAlchemyBase):
                            primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     score = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    chat_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
