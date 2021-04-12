@@ -10,3 +10,4 @@ class User(SqlAlchemyBase):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     score = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     chat_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    lvl_click = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)

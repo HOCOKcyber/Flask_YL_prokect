@@ -17,7 +17,7 @@ def start(update, context):
 
 def base_user(update, context):
     global CHAT_ID
-    reply_keyboard = [['Играть', 'Топ'], ['Донат']]
+    reply_keyboard = [['Играть', 'Топ'], ['Донат'], ['Инфо', 'Магазин']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     db_sess = db_session.create_session()
     CHAT_ID = update.message.chat["id"]
@@ -25,15 +25,18 @@ def base_user(update, context):
     if bd:
         update.message.reply_text(f"Шучу, я знаю, что тебя зовут, {bd.name}", reply_markup=markup)
     else:
-        user_db = User(name=update.message.text, score=0, chat_id=CHAT_ID)
+        user_db = User(name=update.message.text, score=0, chat_id=CHAT_ID, lvl_click=1)
         db_sess.add(user_db)
         db_sess.commit()
         update.message.reply_text(f"Хорошо. Буду звать тебя, {update.message.text}", reply_markup=markup)
-    return ConversationHandler.END
+    return -1
 
 
 def game_info(update, context):
-    reply_keyboard = [['+1'], ['Назад']]
+    global CHAT_ID
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.chat_id == CHAT_ID).first()
+    reply_keyboard = [[f'+{user.lvl_click}'], ['Меню']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     update.message.reply_text("Все что тебе нужно делать - это нажимать на кнопку.\n", reply_markup=markup)
     return 1
@@ -43,15 +46,13 @@ def game(update, context):
     global CHAT_ID
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.chat_id == CHAT_ID).first()
-    user.score += 1
-    reply_keyboard = [['+1'], ['Назад']]
-    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-    update.message.reply_text(f"Твой счет: {user.score}", reply_markup=markup)
+    user.score += user.lvl_click
+    update.message.reply_text(f"Твой счет: {user.score}")
     db_sess.commit()
 
 
 def menu(update, context):
-    reply_keyboard = [['Играть', 'Топ'], ['Донат']]
+    reply_keyboard = [['Играть', 'Топ'], ['Донат'], ['Инфо', 'Магазин']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     update.message.reply_text('Куда пойдем на этот раз?', reply_markup=markup)
     db_sess = db_session.create_session()
@@ -60,7 +61,13 @@ def menu(update, context):
         print(i.name, i.score)
     a = update.message.chat["id"]
     print(a)
-    return ConversationHandler.END
+
+
+def stop(update, context):
+    reply_keyboard = [['Играть', 'Топ'], ['Донат'], ['Инфо', 'Магазин']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+    update.message.reply_text('Куда пойдем на этот раз?', reply_markup=markup)
+    return -1
 
 
 def top(update, context):
@@ -79,6 +86,50 @@ def top(update, context):
     update.message.reply_text(f'{ms}', reply_markup=markup)
 
 
+def user_info(update, context):
+    global CHAT_ID
+    reply_keyboard = [['Назад']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.chat_id == CHAT_ID).first()
+    update.message.reply_text(
+        f' Твое имя: {user.name} \nТвой счет: {user.score} \nТвой прирост за клик: {user.lvl_click}',
+        reply_markup=markup)
+
+
+def upgrade(update, context):
+    reply_keyboard = [['+2 за клик - 200'], ['+3 за клик - 400'], ['+4 за клик - 600'], ['+5 за клик - 800'], ['Меню']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+    update.message.reply_text('Тут ты можешь потратить свои клики на улучшения', reply_markup=markup)
+    return 1
+
+
+def upgrade_dp(update, context):
+    global CHAT_ID
+    ans_user = update.message.text
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.chat_id == CHAT_ID).first()
+    if ans_user == '+2 за клик - 200' and user.score >= 200:
+        user.lvl_click = 2
+        user.score -= 200
+        update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
+    elif ans_user == '+3 за клик - 400' and user.score >= 400:
+        user.lvl_click = 3
+        user.score -= 400
+        update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
+    elif ans_user == '+4 за клик - 600' and user.score >= 600:
+        user.lvl_click = 4
+        user.score -= 600
+        update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
+    elif ans_user == '+5 за клик - 800' and user.score >= 800:
+        user.lvl_click = 5
+        user.score -= 800
+        update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
+    else:
+        update.message.reply_text('У тебя не кликов на эту покупку')
+    db_sess.commit()
+
+
 def donate(update, context):
     update.message.reply_text('Если ты хочешь поддержать меня то перейди поэтой ссылке.\n'
                               'http://127.0.0.1:8080/donate')
@@ -93,7 +144,6 @@ def main():
     updater = Updater(Token, use_context=True)
     dp = updater.dispatcher
 
-    menu_handler = MessageHandler(Filters.regex('Назад'), menu)
     start_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
 
@@ -107,19 +157,32 @@ def main():
         entry_points=[MessageHandler(Filters.regex('Играть'), game_info)],
 
         states={
-            1: [MessageHandler(Filters.text & ~Filters.regex('Назад'), game)]
+            1: [MessageHandler(Filters.text & ~Filters.regex('Меню'), game)]
         },
 
-        fallbacks=[MessageHandler(Filters.regex('Назад'), menu)]
+        fallbacks=[MessageHandler(Filters.regex('Меню'), stop)]
+    )
+    upgrade_handler = ConversationHandler(
+        entry_points=[MessageHandler(Filters.regex('Магазин'), upgrade)],
+
+        states={
+            1: [MessageHandler(Filters.text & ~Filters.regex('Меню'), upgrade_dp)]
+        },
+
+        fallbacks=[MessageHandler(Filters.regex('Меню'), stop)]
     )
     top_handler = MessageHandler(Filters.regex('Топ'), top)
     donate_handler = MessageHandler(Filters.regex('Донат'), donate)
+    info_handler = MessageHandler(Filters.regex('Инфо'), user_info)
+    menu_handler = MessageHandler(Filters.regex('Назад'), menu)
 
     dp.add_handler(donate_handler)
     dp.add_handler(top_handler)
     dp.add_handler(menu_handler)
     dp.add_handler(start_handler)
     dp.add_handler(game_handler)
+    dp.add_handler(info_handler)
+    dp.add_handler(upgrade_handler)
 
     updater.start_polling()
     updater.idle()
