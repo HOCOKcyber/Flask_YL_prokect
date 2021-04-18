@@ -110,19 +110,19 @@ def upgrade_dp(update, context):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.chat_id == CHAT_ID).first()
     if ans_user == '+2 за клик - 200' and user.score >= 200:
-        user.lvl_click = 2
+        user.lvl_click += 2
         user.score -= 200
         update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
     elif ans_user == '+3 за клик - 400' and user.score >= 400:
-        user.lvl_click = 3
+        user.lvl_click += 3
         user.score -= 400
         update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
     elif ans_user == '+4 за клик - 600' and user.score >= 600:
-        user.lvl_click = 4
+        user.lvl_click += 4
         user.score -= 600
         update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
     elif ans_user == '+5 за клик - 800' and user.score >= 800:
-        user.lvl_click = 5
+        user.lvl_click += 5
         user.score -= 800
         update.message.reply_text(f'Успешно.  На твоем счету осталось {user.score}')
     else:

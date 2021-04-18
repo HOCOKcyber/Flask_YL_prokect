@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Твоя статистика</h1>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">Счет : {{ current_user.score }}</li>
+  <li class="list-group-item">Твой ник : {{ current_user.name }}</li>
+  <li class="list-group-item">Твой прирост за клик : {{ current_user.lvl_click }}</li>
+</ul>
+{% endblock %}
+</body>
+</html>
