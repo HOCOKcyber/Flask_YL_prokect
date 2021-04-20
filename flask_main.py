@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect
 from flask_data.donate import DonateForm
 from flask_data.Navbar import NavBarForm
 from flask_data.login import LoginForm
-from data import db_session
+from data import db_session, bot_api
 from data.users import User
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
@@ -76,4 +76,5 @@ def login():
 
 if __name__ == '__main__':
     db_session.global_init("db/blogs.db")
+    app.register_blueprint(bot_api.blueprint)
     app.run(port=8080, host='127.0.0.1')

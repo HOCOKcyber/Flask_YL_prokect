@@ -14,7 +14,9 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand"><font size="5" color="white" face="Arial">Кликер</font></a>
-
+            <a class="nav-link active" aria-current="page" href="http://127.0.0.1:8080/"><font color="white"
+                                                                                               face="Arial">Главная</font></a>
+            <a class="nav-link" href="http://127.0.0.1:8080/donate"><font color="white" face="Arial">Донат</font></a>
             {% if current_user.is_authenticated %}
             <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
             {% else %}
@@ -32,3 +34,4 @@
 
 </body>
 </html>
+
