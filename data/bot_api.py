@@ -22,11 +22,11 @@ def register():
     if bd:
         return jsonify({'message': f"Шучу, я знаю, что тебя зовут, {bd.name}"})
     else:
-        user_db = User(name=request.json['name'], score=request.json['score'], chat_id=request.json['chat_id'],
+        user_bd = User(name=request.json['name'], score=request.json['score'], chat_id=request.json['chat_id'],
                        lvl_click=request.json['lvl_click'])
-        db_sess.add(user_db)
+        db_sess.add(user_bd)
         db_sess.commit()
-        return jsonify({'message': f"Хорошо, буду звать тебя: {user_db.name}"})
+        return jsonify({'message': f"Хорошо, буду звать тебя: {user_bd.name}"})
 
 
 @blueprint.route('/api/bot/game_info/<int:chat_id>', methods=['GET'])

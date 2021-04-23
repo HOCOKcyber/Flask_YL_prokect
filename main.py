@@ -139,5 +139,5 @@ def main():
 
 
 if __name__ == '__main__':
-    db_session.global_init("db/blogs.db")
+    db_session.global_init("db/bot.db")
     main()
