@@ -13,7 +13,11 @@
     {{ form.hidden_tag() }}
     <p>
         {{ form.user_name.label }}<br>
+        {% if current_user.is_authenticated %}
+        {{ form.user_name(class="form-control-plaintext", value=current_user.name) }}<br>
+        {% else %}
         {{ form.user_name(class="form-control") }}<br>
+        {% endif %}
         {% for error in form.user_name.errors %}
     <div class="alert alert-danger" role="alert">
         {{ error }}

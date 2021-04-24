@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect
 from flask_data.donate import DonateForm
-from flask_data.Navbar import NavBarForm
 from flask_data.login import LoginForm
 from data import db_session, bot_api
 from data.users import User
@@ -29,49 +28,36 @@ def logout():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    Nav = NavBarForm()
-    if Nav.validate_on_submit():
-        return redirect('/login')
     if current_user.is_authenticated:
-        return render_template('home.html', Nav=Nav)
-    return render_template('base.html', Nav=Nav)
+        return render_template('home.html')
+    return render_template('base.html')
 
 
 @app.route('/donate', methods=['GET', 'POST'])
 def donate():
     form = DonateForm()
-    Nav = NavBarForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         if not db_sess.query(User).filter(User.name == form.user_name.data).first():
-            return render_template('donate.html', title='Донат', form=form, message="Пользователя не существует",
-                                   Nav=Nav)
-
+            return render_template('donate.html', title='Донат', form=form, message="Пользователя не существует")
         user = db_sess.query(User).filter(User.name == form.user_name.data).first()
         user.score += int(form.donate.data) * 50
         db_sess.commit()
-        return render_template('after_donate.html', Nav=Nav)
-    if Nav.validate_on_submit():
-        return redirect('/login')
-    return render_template('donate.html', title='Донат', form=form, Nav=Nav)
+        return render_template('after_donate.html')
+    return render_template('donate.html', title='Донат', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     login = LoginForm()
-    Nav = NavBarForm()
     if login.validate_on_submit():
         db_sess = db_session.create_session()
         if not db_sess.query(User).filter(User.name == login.login.data).first():
-            return render_template('login.html', title='Вход', login=login, message="Пользователя не существует",
-                                   Nav=Nav)
+            return render_template('login.html', title='Вход', login=login, message="Пользователя не существует", )
         user = db_sess.query(User).filter(User.name == login.login.data).first()
         login_user(user)
         return redirect("/")
-    if Nav.validate_on_submit():
-        return redirect('/login')
-
-    return render_template('login.html', title='Вход', login=login, Nav=Nav)
+    return render_template('login.html', title='Вход', login=login)
 
 
 if __name__ == '__main__':

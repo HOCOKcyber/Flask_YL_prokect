@@ -1,8 +1,6 @@
-from telegram.ext import Updater, MessageHandler, Filters
-from telegram.ext import CommandHandler, ConversationHandler
+from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, ConversationHandler
 from telegram import ReplyKeyboardMarkup
 from data import db_session
-from data.users import User
 from requests import get, post
 
 CHAT_ID = None
